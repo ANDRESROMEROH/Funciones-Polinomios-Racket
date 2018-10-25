@@ -65,6 +65,66 @@
         ))))
 
 
+;Resta de Polinomios
+
+(define -p
+  (lambda (listaPolinomios)
+    (display-p (restar-polinomios listaPolinomios '()))
+   ))
+
+(define restar-polinomios
+  (lambda (listaPolinomios auxiliar)
+         (cond
+           [(null? listaPolinomios) auxiliar]
+               [(null? auxiliar) (restar-polinomios (cdr listaPolinomios) (car listaPolinomios))]
+               [else
+                (restar-polinomios (cdr listaPolinomios) (sumar (negar-polinomio(car listaPolinomios)) auxiliar))
+               ])))
+
+
+(define negar-polinomio
+  (lambda (polinomio)
+    (cond
+      [(null? polinomio) polinomio]
+      [else
+       (cons (cambiar-signo (car polinomio)) (negar-polinomio (cdr polinomio)))])))
+
+(define cambiar-signo ;Cambia el signo de cada numero, devuelve un numero
+  (lambda (numero)
+    (if (>  numero 0)
+        (string->number (string-append "-" (number->string numero)))
+        (string->number (string-append "+" (number->string (- numero)))))
+      ))
+    
+ 
+
+;Multiplicacion de Polinomios
+(define *p
+  (lambda (listaPolinomios)
+    (display-p (multiplicar-polinomios listaPolinomios '()))
+   ))
+
+(define multiplicar-polinomios
+  (lambda (listaPolinomios auxiliar)
+         (cond
+           [(null? listaPolinomios) auxiliar]
+               [(null? auxiliar) (multiplicar-polinomios (cdr listaPolinomios) (car listaPolinomios))]
+               [else
+                (multiplicar-polinomios (cdr listaPolinomios) (multiplicar (car listaPolinomios) auxiliar))
+               ])))
+
+(define multiplicar
+  (lambda (p1 p2)
+    (if (= (length p1) (length p2)) (map * p1 p2)
+        (cond
+          [(null? p1) p2]
+          [(null? p2) p1]
+          [else
+           (cons (* (car p1) (car p2)) (multiplicar (cdr p1) (cdr p2)))
+          ]
+        ))))
+
+
 
 
     
