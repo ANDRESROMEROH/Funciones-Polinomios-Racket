@@ -36,6 +36,7 @@
     )
   )
 
+
 ;Suma de Polinomios:
 ;La función mostrará el polinomio utilizando una notación estándar.
 
@@ -98,7 +99,8 @@
     
  
 
-;Multiplicacion de Polinomios
+;Multiplicacion de Polinomios:
+
 (define *p
   (lambda (listaPolinomios)
     (display-p (multiplicar-polinomios listaPolinomios '()))
@@ -124,6 +126,31 @@
           ]
         ))))
 
+
+
+;Derivacion de Polinomios:
+;'(0 2 3 1) = 2𝑥+3𝑥^2+𝑥^3 -> ("2" "6x^1" "3x^2")
+
+(define derivar-polinomios ;'((0 2 3 1) (1 2 4 5))
+  (lambda (listaPolinomios)
+         (cond
+               [(null? listaPolinomios) '()]
+               [(= (length listaPolinomios) 1) (list (derivar (car listaPolinomios) 0))]
+               [else
+                (cons (derivar (car listaPolinomios) 0) (derivar-polinomios (cdr listaPolinomios)))
+               ])))
+
+(define derivar                 
+  (lambda (polinomio potencia)    
+    (if (null? polinomio) '()       
+        (if (= (car polinomio) 0) (derivar (cdr polinomio) (+ potencia 1))
+            (if (= potencia 0) (derivar (cdr polinomio) (+ potencia 1))
+        (cons 
+        (cond
+           [(= (car polinomio) 1) (string-append (number->string potencia) (string-append "X^" (number->string (- potencia 1))))]
+           [(string-append (number->string (* (car polinomio) potencia)) (if (= potencia 1) ""
+            (string-append "X^" (number->string (- potencia 1)))))])
+        (derivar (cdr polinomio) (+ potencia 1))))))))
 
 
 
