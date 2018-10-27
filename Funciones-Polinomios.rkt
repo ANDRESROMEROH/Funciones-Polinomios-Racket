@@ -100,20 +100,20 @@
  
 
 ;Multiplicacion de Polinomios:
-
-(define *p
+;Por ejemplo: (*p '((-5 -6 -9) (3 1))) = "-15-23X-33X^2-9X^3"
+(define *p ;Recibe una lista de polinomios y devuelve la multiplicacion entre ellos.
   (lambda (listaPolinomios)
-    (+p (multiplicar-polinomios listaPolinomios '()));Suma los polinomios resultantes
+    (display-p (multiplicar listaPolinomios '()))
    ))
 
-(define multiplicar-polinomios
+(define multiplicar
   (lambda (listaPolinomios auxiliar)
-         (cond
-           [(null? listaPolinomios) auxiliar]
-               [(null? auxiliar) (multiplicar-polinomios (cdr listaPolinomios) (car listaPolinomios))]
-               [else
-                (multiplicar-polinomios (cdr listaPolinomios) (multp-pol (car listaPolinomios) auxiliar 0))
-               ])))
+  (cond
+    [(null? listaPolinomios) auxiliar]
+    [(null? auxiliar) (multiplicar (cdr listaPolinomios) (car listaPolinomios))]
+    [else
+     (multiplicar (cdr listaPolinomios) (sumar-polinomios (multp-pol (car listaPolinomios) auxiliar 0) '()))
+     ])))
 
 (define multp-pol ;Aqui forma las listas de polinomios multiplicados.
   (lambda (p1 p2 i)
