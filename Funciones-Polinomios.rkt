@@ -103,7 +103,7 @@
 
 (define *p
   (lambda (listaPolinomios)
-    (display-p (multiplicar-polinomios listaPolinomios '()))
+    (+p (multiplicar-polinomios listaPolinomios '()));Suma los polinomios resultantes
    ))
 
 (define multiplicar-polinomios
@@ -112,19 +112,42 @@
            [(null? listaPolinomios) auxiliar]
                [(null? auxiliar) (multiplicar-polinomios (cdr listaPolinomios) (car listaPolinomios))]
                [else
-                (multiplicar-polinomios (cdr listaPolinomios) (multiplicar (car listaPolinomios) auxiliar))
+                (multiplicar-polinomios (cdr listaPolinomios) (multp-pol (car listaPolinomios) auxiliar 0))
                ])))
 
-(define multiplicar
-  (lambda (p1 p2)
-    (if (= (length p1) (length p2)) (map * p1 p2)
-        (cond
-          [(null? p1) p2]
-          [(null? p2) p1]
-          [else
-           (cons (* (car p1) (car p2)) (multiplicar (cdr p1) (cdr p2)))
-          ]
-        ))))
+(define multp-pol ;Aqui forma las listas de polinomios multiplicados.
+  (lambda (p1 p2 i)
+    (cond
+      [(null? p1) p1]
+      [(null? p2) p1]
+      [else
+       (cons (completar-pol(num-por-pol p2 (car p1)) i) (multp-pol (cdr p1) p2 (+ i 1)))]))) 
+
+
+(define completar ;Devuelve una cantidad arbitraria de 0s
+  (lambda (x)
+    (cond
+      [(< x 1) '()]
+      [else
+       (cons 0 (completar(- x 1)))])))
+
+
+    
+(define completar-pol ;Completa el polinomio con 0 por si no hay valores
+  (lambda (pol i)
+    (cond
+      [(null? pol) pol]
+      [else
+       (append (completar i) pol)])))
+
+    
+
+(define num-por-pol ;Multiplica un numero por un polinomio y devuelve una lista de valores
+  (lambda (pol x)
+    (cond
+      [(null? pol) pol]
+      [else
+       (cons (* (car pol) x) (num-por-pol (cdr pol) x))])))
 
 
 
@@ -153,5 +176,38 @@
         (derivar (cdr polinomio) (+ potencia 1))))))))
 
 
+;Evaluacion de Polinomios
+;(eval-p '(9 5 8 12 3) 3) => 663
+(define eval-p
+  (lambda (p x)
+    (cond
+      [(= (length p) 1) p]
+      [else
+       (suma-basica (evaluar p x 0))])))
+
+
+(define suma-basica ;Suma todos los elementos de una lista
+  (lambda (p)
+    (if
+      (null? p)
+      0
+      (+ (car p) (suma-basica (cdr p))))))
+
+(define evaluar ;Multiplica cada elemento del polinomio por el valor de la x dado
+  (lambda (p x i)
+    (cond
+      [(null? p) p]
+      [else
+       (cons (* (car p) (desarrollo-x x i)) (evaluar (cdr p) x (+ 1 i)))])))
+
+
+(define desarrollo-x ;Ejecuta la multiplicacion del monomio, x es el valor e i es la potencia.
+  (lambda (x i)
+    (cond
+      [(= x 1) x]
+      [(= i 0) 1]
+      [else
+       (* x (desarrollo-x x (- i 1)))])))
+    
 
     
