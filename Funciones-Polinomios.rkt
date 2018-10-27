@@ -39,7 +39,7 @@
 
 ;Suma de Polinomios:
 ;La función mostrará el polinomio utilizando una notación estándar.
-
+;(+p '(7 8 9) '(3 4 5) '(1 1 1 7)) => "+11+13X+15X^2+7X^3"
 (define +p
   (lambda listaPolinomios
     (display-p (sumar-polinomios listaPolinomios '()))
@@ -67,7 +67,7 @@
 
 
 ;Resta de Polinomios
-
+;(-p '(3 1) '(-5 2) '(-1 6)) => "+9-7X"
 (define -p
   (lambda listaPolinomios
     (display-p (restar-polinomios listaPolinomios '()))
@@ -100,7 +100,7 @@
  
 
 ;Multiplicacion de Polinomios:
-;Por ejemplo: (*p '((-5 -6 -9) (3 1))) = "-15-23X-33X^2-9X^3"
+;Por ejemplo: (*p '(-5 -6 -9) '(3 1)) = "-15-23X-33X^2-9X^3"
 (define *p ;Recibe una cantidad arbitraria de polinomios y devuelve la multiplicacion entre ellos.
   (lambda listaPolinomios
     (display-p (multiplicar listaPolinomios '()))
@@ -155,7 +155,7 @@
 ;'(0 2 3 1) = 2𝑥+3𝑥^2+𝑥^3 -> ("2" "6x^1" "3x^2")
 
 (define derivar-polinomios ;'((0 2 3 1) (1 2 4 5))
-  (lambda listaPolinomios
+  (lambda (listaPolinomios)
          (cond
                [(null? listaPolinomios) '()]
                [(= (length listaPolinomios) 1) (list (derivar (car listaPolinomios) 0))]
