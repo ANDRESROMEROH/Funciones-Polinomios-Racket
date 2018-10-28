@@ -222,6 +222,7 @@
 
 ;--------------------------------------------------------------------------------------------------------------------------------------------------
 
+;Division de Polinomios
 (define ultimo-item ;Retorna el ultimo elemento de un polinomio.
   (lambda (polinomio)
     (list-ref polinomio (grado-polinomio polinomio))))
@@ -291,3 +292,55 @@ El resultado es una lista que contiene el cociente y el residuo de la división:
 
 
 ;--------------------------------------------------------------------------------------------------------------------------------------
+
+;Factorización
+;Polinomio de grado 2 (fact-p '(4 4 1)) => '((2 1) (2 1))
+;Polinomio de grado 3
+
+(define fact-p
+  (lambda (pol)
+    (cond
+      [ (= (length pol) 3) (fact-2g pol)]
+     ; [ (= (length pol) 4) (fact-3g pol)]
+      [else
+       pol])))
+
+
+(define fact-2g
+(lambda (pol)
+  (cond
+    [(= (caddr pol) 0) pol]
+    [(null? pol) pol]
+    [else
+     (cons (list (cambiar-signo (formula-resta pol)) 1) (list (list (cambiar-signo (formula-suma pol)) 1)))])))
+  
+
+(define formula-resta
+  (lambda (pol)
+    (cond
+      [(= (caddr pol) 0) pol]
+      [(null? pol) pol]
+      [else (/ (- (cambiar-signo (cadr pol)) (raiz pol)) (* 2 (caddr pol)))])))
+
+(define formula-suma
+  (lambda (pol)
+    (cond
+      [(= (caddr pol) 0) pol]
+      [(null? pol) pol]
+      [else (/ (+ (cambiar-signo (cadr pol)) (raiz pol)) (* 2 (caddr pol)))])))
+
+
+(define raiz
+  (lambda (pol)
+    (cond
+     [(null? pol) pol]
+     [else
+      (sqrt(- (desarrollo-x (cadr pol) 2) (* 4 (* (caddr pol) (car pol)))))])))
+
+
+
+
+
+
+
+
