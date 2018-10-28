@@ -1,13 +1,13 @@
+#lang racket
+
 #|
      Proyecto #2, Paradigmas de Programacion
      Andres Romero Hernandez
      Estefania Murillo Romero
 |#
 
-#lang racket
 
-;Despliegue de polinomios, la funcion mostrara el polinomio utilizando
-;la notacion estandar
+;Despliegue de polinomios, la funcion mostrara el polinomio utilizando la notacion estandar
 
 (define display-p
   (lambda (polinomio) ;Ej: '(0 2 3 1) = 2𝑥+3𝑥^2+𝑥^3
@@ -18,7 +18,7 @@
   (lambda (polinomio potencia)      ;Recibe 2 parametros, una lista y la potencia actual.
     (if (null? polinomio) '()       ;Si la lista es nula devuelva una lista vacia (Caso base)
         (if (= (car polinomio) 0) (transformar (cdr polinomio) (+ potencia 1)) ;Valida que numero no sea cero, de otra forma no se toma en cuenta.
-        (cons ;Else:
+        (cons 
          (cond
            [(= potencia 0) (adjuntar-signo polinomio)] ;Si la potencia es cero se adjunta el numero solo.
                [(= (car polinomio) 1) (string-append "+X^" (number->string potencia))]
@@ -36,10 +36,12 @@
     )
   )
 
+;------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ;Suma de Polinomios:
 ;La función mostrará el polinomio utilizando una notación estándar.
 ;(+p '(7 8 9) '(3 4 5) '(1 1 1 7)) => "+11+13X+15X^2+7X^3"
+
 (define +p
   (lambda listaPolinomios
     (display-p (sumar-polinomios listaPolinomios '()))
@@ -65,9 +67,11 @@
           ]
         ))))
 
+;---------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ;Resta de Polinomios
 ;(-p '(3 1) '(-5 2) '(-1 6)) => "+9-7X"
+
 (define -p
   (lambda listaPolinomios
     (display-p (restar-polinomios listaPolinomios '()))
@@ -96,11 +100,13 @@
         (string->number (string-append "-" (number->string numero)))
         (string->number (string-append "+" (number->string (- numero)))))
       ))
-    
- 
+
+
+;-------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ;Multiplicacion de Polinomios:
-;Por ejemplo: (*p '(-5 -6 -9) '(3 1)) = "-15-23X-33X^2-9X^3"
+;Ejemplo: (*p '(-5 -6 -9) '(3 1)) = "-15-23X-33X^2-9X^3"
+
 (define *p ;Recibe una cantidad arbitraria de polinomios y devuelve la multiplicacion entre ellos.
   (lambda listaPolinomios
     (display-p (multiplicar listaPolinomios '()))
@@ -115,7 +121,7 @@
      (multiplicar (cdr listaPolinomios) (sumar-polinomios (multp-pol (car listaPolinomios) auxiliar 0) '()))
      ])))
 
-(define multp-pol ;Aqui forma las listas de polinomios multiplicados.
+(define multp-pol ;Forma las listas de polinomios multiplicados.
   (lambda (p1 p2 i)
     (cond
       [(null? p1) p1]
@@ -133,7 +139,7 @@
 
 
     
-(define completar-pol ;Completa el polinomio con 0 por si no hay valores
+(define completar-pol ;Completa el polinomio con 0s por si no hay valores
   (lambda (pol i)
     (cond
       [(null? pol) pol]
@@ -150,6 +156,7 @@
        (cons (* (car pol) x) (num-por-pol (cdr pol) x))])))
 
 
+;-------------------------------------------------------------------------------------------------------------------------------------------------
 
 ;Derivacion de Polinomios:
 ;'(0 2 3 1) = 2𝑥+3𝑥^2+𝑥^3 -> ("2" "6x^1" "3x^2")
@@ -176,8 +183,11 @@
         (derivar (cdr polinomio) (+ potencia 1))))))))
 
 
+;------------------------------------------------------------------------------------------------------------------------------------------------
+
 ;Evaluacion de Polinomios
 ;(eval-p '(9 5 8 12 3) 3) => 663
+
 (define eval-p
   (lambda (p x)
     (cond
@@ -201,7 +211,7 @@
        (cons (* (car p) (desarrollo-x x i)) (evaluar (cdr p) x (+ 1 i)))])))
 
 
-(define desarrollo-x ;Ejecuta la multiplicacion del monomio, x es el valor e i es la potencia.
+(define desarrollo-x ;Ejecuta la multiplicacion del monomio, X es el valor e I es la potencia.
   (lambda (x i)
     (cond
       [(= x 1) x]
@@ -210,4 +220,74 @@
        (* x (desarrollo-x x (- i 1)))])))
     
 
-    
+;--------------------------------------------------------------------------------------------------------------------------------------------------
+
+(define ultimo-item ;Retorna el ultimo elemento de un polinomio.
+  (lambda (polinomio)
+    (list-ref polinomio (grado-polinomio polinomio))))
+
+
+(define const-lista ;Construye una lista de n 0s y el numero indicado al final.
+  (lambda (numero ceros)
+    (append (completar ceros) (list numero))))
+
+
+(define grado-polinomio ;Determina el grado de un polinomio segun la cantidad de coeficientes.
+  (lambda (p)
+  (for/fold ([d -inf.0]) ([(pi i) (in-indexed p)])
+    (if (zero? pi) d i))))
+
+
+(define pol-mult-cociente ;Lleva acabo la multiplicacion de un cociente indicado con su potencia, 
+        (lambda (cociente grado polinomio) ;por cada uno de los respectivos coeficientes del denominador.
+          (append (make-list grado 0) (map (lambda (x) (* x cociente)) polinomio))))
+
+
+(define (residuo-resta a p b q) ;Calcula el residuo al efectuar la resta del numerador y
+  (cond [(< (grado-polinomio p) 0) q] ;el resultado de las multiplicaciones efectuadas entre el denominador y los elementos del cociente.
+        [(< (grado-polinomio q) 0) p]
+        [(< (grado-polinomio p) (grado-polinomio q)) (residuo-resta b q a p)]
+        [else
+        (if (= (length p) (length q)) (map (lambda (x y) (+ (* a x) (* b y))) p q)
+            (cons (+ (* a (car p)) (* b (car q))) (residuo-resta a (cdr p) b (cdr q))))]))
+
+
+#|Funciones que ayudan a la transformacion entre numeros positivos y negativos:|#
+(define (division+ p q) (residuo-resta 1 p  1 q))
+(define (division- p q) (residuo-resta 1 p -1 q))
+#|-----------------------------------------------------------------------------|#
+
+
+(define (qt-p numerador denominador) ;Calcula el cociente de la division entre 2 polinomios
+  (cond
+    [(< (grado-polinomio numerador) (grado-polinomio denominador)) 0]
+    [else    
+         (division+
+          (const-lista
+           (/ (ultimo-item numerador) (ultimo-item denominador)) (- (grado-polinomio numerador) (grado-polinomio denominador)))
+            (qt-p
+             (division- numerador
+              (pol-mult-cociente
+               (/ (ultimo-item numerador) (ultimo-item denominador)) (- (grado-polinomio numerador) (grado-polinomio denominador)) denominador)) denominador))
+        ]))
+
+
+(define (rem-p numerador denominador) ;Calcula el residuo de la division entre 2 polinomios
+  (cond
+    [(< (grado-polinomio numerador) (grado-polinomio denominador)) numerador]
+    [else    
+          (rem-p
+           (division- numerador
+             (pol-mult-cociente
+              (/ (ultimo-item numerador) (ultimo-item denominador)) (- (grado-polinomio numerador) (grado-polinomio denominador)) denominador)) denominador)
+          ]))
+
+
+#|Esta función calcula el resultado de la división de los polinomios recibidos como parámetro.
+El resultado es una lista que contiene el cociente y el residuo de la división:|#
+
+(define (/-p numerador denominador)
+  (values (qt-p numerador denominador) (rem-p numerador denominador)))
+
+
+;--------------------------------------------------------------------------------------------------------------------------------------
