@@ -9,9 +9,9 @@
 
 
 ;Despliegue de polinomios, la función mostrará el polinomio utilizando la notación estándar
-
+;(display-p '(0 2 3 1)) = 2x+3x^2+x^3
 (define display-p
-  (lambda (polinomio) ;Ej: '(0 2 3 1) = 2𝑥+3𝑥^2+𝑥^3
+  (lambda (polinomio) 
       (string-append* "" (transformar polinomio 0)))) ;Une cada uno de los resultados en un solo string
 
 
@@ -161,7 +161,7 @@
 
 ;Derivación de Polinomios:
 ;(derivar-polinomios '((0 2 3 1))) = 2𝑥+3𝑥^2+𝑥^3 => ("2" "6x^1" "3x^2")
-;(derivar-polinomios('((0 2 3 1) (1 2 4 5))) => '(("2" "6X^1" "3X^2")("2" "8X^1" "15X^2"))
+;(derivar-polinomios '((0 2 3 1) (1 2 4 5))) => '(("2" "6X^1" "3X^2")("2" "8X^1" "15X^2"))
 
 (define derivar-polinomios 
   (lambda (listaPolinomios)
@@ -308,15 +308,16 @@ El resultado es una lista que contiene el cociente y el residuo de la división:
 
 ;Factorización
 ;Polinomio de grado 2 (fact-p '(4 4 1)) => '((2 1) (2 1))
-;Polinomio de grado 3
+;                     (fact-p '(-6 1 1)) => '((3 1) (-2 1))
+;Polinomio de grado 3 (fact-p '(-72 -6 7 1)) => '((-3 1) (4 1) (6 1))
+;Polinomio de grado superior (fact-p '(72 -42 -39 6 3)) o (fact-p '(24 -14 -13 2 1)) =>'((-1 1) (-3 1) (2 1) (4 1))
 
 (define fact-p
   (lambda (pol)
     (cond
       [ (= (length pol) 3) (fact-2g pol)]
-     ; [ (= (length pol) 4) (fact-3g pol)]
       [else
-       pol])))
+       (factorizar pol)])))
 
 
 (define fact-2g ;Realiza la factorización de polinomios de grado 2
@@ -350,7 +351,66 @@ El resultado es una lista que contiene el cociente y el residuo de la división:
      [else
       (sqrt(- (desarrollo-x (cadr pol) 2) (* 4 (* (caddr pol) (car pol)))))])))
 
+(define divisores-positivos ;Consigue los divisores positivos de un número
+  (lambda (num i lista)
+    (cond
+      [(= i 0) lista]
+      [(= (modulo num i) 0) (cons i (divisores-positivos num (- i 1) lista))]
+      [else
+       (divisores-positivos num (- i 1) lista)])))
 
+(define factorizar ;Método que llama al que devuelve la factorización.
+  (lambda (pol)
+    (cond
+      [(= (car pol) 0) (metodo (reverse (cdr pol)) (divisores (hacer-positivo (cadr pol))) (list (list 0 1)))]
+      [else
+        (metodo (reverse pol) (divisores (hacer-positivo (car pol))) '())])))
+
+
+(define metodo ;Devuelve la factorización de un polinomio
+  (lambda (pol divisores resultados)
+    (cond
+      [(null? pol) resultados]
+      [(null? divisores) resultados]
+      [else
+       (cond
+         [(equal? (verificar pol (car divisores) '()) #t) (metodo pol (cdr divisores) (cons (list (cambiar-signo (car divisores)) 1) resultados))]
+         [(equal? (verificar pol (car divisores) '()) #f) (metodo pol (cdr divisores) resultados)])])))
+
+
+
+(define divisores ;Consigue la lista de divisores de un número
+  (lambda (num)
+   (append (map (lambda (x) (* x -1)) (divisores-positivos num num '())) (divisores-positivos num num '()))
+    ))
+
+(define verificar ;Devuelve true si el car del resultado es 0
+  (lambda (pol div res)
+    (cond
+      [(= (car (operacion-principal pol div res)) 0) #t]
+      [else
+       #f])))
+
+(define operacion-principal ;Realiza la operación principal del método de Ruffini
+  (lambda (pol div res)
+    (cond
+      [(null? pol) res]
+      [(null? res) (operacion-principal (cdr pol) div (list (car pol)))]
+      [else
+       (operacion-principal (cdr pol) div (append (list (desarrolla-operacion div (car res) (car pol))) res))])))
+
+
+(define desarrolla-operacion
+  (lambda (divisor res num-pol) ; res = resultado, num-pol = coeficiente del polinomio
+    (+ num-pol (* res divisor))))
+
+
+(define hacer-positivo ;Cambia el signo de un número si este es negativo, devuelve un número
+  (lambda (numero)
+    (if (>  numero 0)
+        numero
+        (string->number (string-append "+" (number->string (- numero)))))
+      ))
 
 
 
